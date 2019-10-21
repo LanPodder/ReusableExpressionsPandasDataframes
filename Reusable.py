@@ -16,4 +16,17 @@ expression.add_condition('hour_of_day', lambda x: x>12)
 expression.add_condition('spend', lambda x: x>10)
 
 df['Overspend midday'] = df.apply(lambda x: 'Yes' if(expression.allmatch(x)) else 'No', axis=1)
+
+#you can even combine multiple expression blocks:
+
+expression1 = TableExpression()
+expression2 = TableExpression()
+
+expression1.add_condition('spend', lambda x: x<10)
+expression1.add_condition('hour_of_day', lambda x: x<13)
+
+expression2.add_condition('spend', lambda x: x >= 20)
+expression2.add_condition('hour_of_day', lambda x: x >= 13)
+
+df['combined_expressions'] = df.apply(lambda x: 'Yes' if(expression1.anymatch(x) or expression2.allmatch(x)) else 'No', axis=1)
 print(df)
