@@ -4,6 +4,7 @@ class TableExpression:
     
     def add_condition(self, key, expression):
         self.expressionmap[key] = expression
+        return self
     
     def allmatch(self, checkmap):
         for key in self.expressionmap:

@@ -19,14 +19,37 @@ df['Overspend midday'] = df.apply(lambda x: 'Yes' if(expression.allmatch(x)) els
 
 #you can even combine multiple expression blocks:
 
-expression1 = TableExpression()
-expression2 = TableExpression()
 
-expression1.add_condition('spend', lambda x: x<10)
-expression1.add_condition('hour_of_day', lambda x: x<13)
+expression1 = TableExpression()\
+    .add_condition('spend', lambda x: x<10)\
+    .add_condition('hour_of_day', lambda x: x<13)
 
-expression2.add_condition('spend', lambda x: x >= 20)
-expression2.add_condition('hour_of_day', lambda x: x >= 13)
+expression2 = TableExpression()\
+    .add_condition('spend', lambda x: x >= 20)\
+    .add_condition('hour_of_day', lambda x: x >= 13)
 
 df['combined_expressions'] = df.apply(lambda x: 'Yes' if(expression1.anymatch(x) or expression2.allmatch(x)) else 'No', axis=1)
+
+#or even instantiate them directly inside a list if you have a ton of different expressions
+expression_list = [
+    TableExpression()
+        .add_condition('spend', lambda x: x+2 < 10)
+        .add_condition('hour_of_day', lambda x: x==12),
+    TableExpression()
+        .add_condition('spend', lambda x: x > 10)
+        .add_condition('hour_of_day', lambda x: x == 13),
+    TableExpression()
+        .add_condition('spend', lambda x: x >= 20)
+        .add_condition('hour_of_day', lambda x: x >= 14)
+]
+
+#and for instance check if any expression block is true for expression.allmatch
+def any_expression_all_match(expression_list, x):
+    for expression in expression_list:
+        if(expression.allmatch(x)):
+            return True
+    return False
+
+df['list_of_expr'] = df.apply(lambda x: 'Yes' if(any_expression_all_match(expression_list, x)) else 'No', axis=1)
+
 print(df)
